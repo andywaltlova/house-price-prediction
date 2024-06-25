@@ -2,7 +2,10 @@
 
 This repository contains a Python script that generates a model, stores it in a file and then uses it to generate a house price prediction based on the property parameters.
 
-TODO: Specification of implementation
+## Stack
+
+- Backend = Flask
+- Frontend = React with use of [Material UI](https://mui.com/)
 
 ## How to run locally
 
@@ -14,4 +17,16 @@ docker-compose up
 
 ## Possible future improvements
 
-- [ ] TODO
+Backend:
+
+- [ ] Cache the requests in Redis
+- [ ] Use Gunicorn or some WSGI
+- [ ] Take care of CORS
+
+Frontend:
+
+- [ ] Refine the details - favicon, title etc.
+
+General:
+
+- [ ] Add linter + pre-commit
