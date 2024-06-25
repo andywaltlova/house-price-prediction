@@ -22,6 +22,7 @@ Backend:
 - [ ] Cache the requests in Redis
 - [ ] Use Gunicorn or some WSGI
 - [ ] Take care of CORS
+- [ ] Add tests for the sample inputs
 
 Frontend:
 
