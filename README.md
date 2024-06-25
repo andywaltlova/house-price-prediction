@@ -24,10 +24,12 @@ Backend:
 - [ ] Use Gunicorn or some WSGI
 - [ ] Take care of CORS
 - [ ] Add tests for the sample inputs
+- [ ] Add versioning to the API + docs endpoint
 
 Frontend:
 
 - [ ] Refine the details - favicon, title etc.
+- [ ] Cypress tests
 
 General:
 
