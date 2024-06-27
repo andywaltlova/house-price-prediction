@@ -1,6 +1,7 @@
 import React from 'react';
-import { CssBaseline, Container, Box, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
+import { CssBaseline, Container, Box, ThemeProvider, createTheme, useMediaQuery, Typography } from '@mui/material';
 import SimpleForm from './SimpleForm';
+import Header from './Header';
 
 const MainPage = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -18,7 +19,8 @@ const MainPage = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container component="main" maxWidth="sm">
+      <Header />
+      <Container component="main" maxWidth="false">
         <Box
           sx={{
             display: 'flex',

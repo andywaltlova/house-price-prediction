@@ -9,10 +9,13 @@ class PredictSchema(Schema):
     population = fields.Float(required=True, validate=validate.Range(min=0))
     households = fields.Float(required=True, validate=validate.Range(min=0))
     median_income = fields.Float(required=True)
-    is_less_than_1h_ocean = fields.Boolean(required=True)
-    is_inland = fields.Boolean(required=True)
-    is_island = fields.Boolean(required=True)
-    is_near_bay = fields.Boolean(required=True)
-    is_near_ocean = fields.Boolean(required=True)
+    ocean_proximity = fields.String(required=True, validate=validate.OneOf([
+        '<1H OCEAN',
+        'INLAND',
+        'ISLAND',
+        'NEAR BAY',
+        'NEAR OCEAN',
+    ]))
     price = fields.Float(nullable=True, validate=validate.Range(min=0))
     created_at = fields.DateTime(dump_only=True)
+    map_url = fields.String(dump_only=True)

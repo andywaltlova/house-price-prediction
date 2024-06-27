@@ -6,6 +6,7 @@ This repository contains a Python script that generates a model, stores it in a 
 
 - Backend = Flask
 - Frontend = React with use of [Material UI](https://mui.com/)
+- DB = sqlite (on startup is created at `flask-backend/instance/data.db`)
 
 ## How to run locally
 
@@ -25,11 +26,13 @@ Backend:
 - [ ] Take care of CORS
 - [ ] Add tests for the sample inputs
 - [ ] Add versioning to the API + docs endpoint
+- [ ] What should happen with duplicate requests? So far it is just saved with new timestamp
 
 Frontend:
 
 - [ ] Refine the details - favicon, title etc.
 - [ ] Cypress tests
+- [ ] Check how it looks on smaller devices
 
 General:
 

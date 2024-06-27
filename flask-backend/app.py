@@ -1,4 +1,5 @@
 from flask import Flask, request, send_from_directory, jsonify, make_response
+from sqlalchemy.ext.hybrid import hybrid_property
 from marshmallow import ValidationError
 
 import pandas as pd
@@ -27,13 +28,13 @@ class PredictedPrice(db.Model):
     population = db.Column(db.Float, nullable=False)
     households = db.Column(db.Float, nullable=False)
     median_income = db.Column(db.Float, nullable=False)
-    is_less_than_1h_ocean = db.Column(db.Boolean, nullable=False, default=False)
-    is_inland = db.Column(db.Boolean, nullable=False, default=False)
-    is_island = db.Column(db.Boolean, nullable=False, default=False)
-    is_near_bay = db.Column(db.Boolean, nullable=False, default=False)
-    is_near_ocean = db.Column(db.Boolean, nullable=False, default=False)
+    ocean_proximity = db.Column(db.String, nullable=False)
     price= db.Column(db.Float, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+
+    @hybrid_property
+    def map_url(self):
+        return f"https://www.google.com/maps/place/{self.latitude},{self.longitude}"
 
 
 @app.route('/', defaults={'path': ''})
@@ -59,37 +60,56 @@ def predict_price():
         response = jsonify({"error": "No data provided"})
         return _corsify_actual_response(response), 400
 
-    db_name_map = {
-        'ocean_proximity_<1H OCEAN': 'is_less_than_1h_ocean',
-        'ocean_proximity_INLAND': 'is_inland',
-        'ocean_proximity_ISLAND': 'is_island',
-        'ocean_proximity_NEAR BAY': 'is_near_bay',
-        'ocean_proximity_NEAR OCEAN': 'is_near_ocean'
+    ocean_proximity_valid_values = {
+        '<1H OCEAN',
+        'INLAND',
+        'ISLAND',
+        'NEAR BAY',
+        'NEAR OCEAN',
     }
 
     try:
         # Attempt to deserialize and validate data
-        for key, value in db_name_map.items():
-            data[value] = bool(data.pop(key, 0))
 
-        if ocean_proximity := data.pop('ocean_proximity', None):
-            key = db_name_map.get(f'ocean_proximity_{ocean_proximity}', None)
-            if key:
-                data[key] = True
+        ocean_proximity = data.pop('ocean_proximity', None)
+        if ocean_proximity not in ocean_proximity_valid_values:
+            response = jsonify({"error": f"Invalid ocean_proximity value: {ocean_proximity}"})
+            return _corsify_actual_response(response), 400
 
         schema = PredictSchema()
+        data['ocean_proximity'] = ocean_proximity
         validated_data = schema.load(data)
     except ValidationError as err:
         response = jsonify(err.messages)
         return _corsify_actual_response(response), 400
 
-    df = pd.DataFrame([validated_data])
+    ocean_proximity_columns = {f'ocean_proximity_{op}': 0 for op in ocean_proximity_valid_values}
+    ocean_proximity_columns[f'ocean_proximity_{ocean_proximity}'] = 1
+    predict_data = {**validated_data, **ocean_proximity_columns}
+    predict_data.pop('ocean_proximity', None) # Not desired for prediction
+    df = pd.DataFrame(
+        [predict_data],
+        columns=[
+            'longitude',
+            'latitude',
+            'housing_median_age',
+            'total_rooms',
+            'total_bedrooms',
+            'population',
+            'households',
+            'median_income',
+            'ocean_proximity_<1H OCEAN',
+            'ocean_proximity_INLAND',
+            'ocean_proximity_ISLAND',
+            'ocean_proximity_NEAR BAY',
+            'ocean_proximity_NEAR OCEAN',
+        ]
+    )
     predicted_price = predict(df, model)
 
-    validated_data['price'] = round(predicted_price[0],8)
+    validated_data['price'] = round(predicted_price[0], 8)
 
-    prediction_row = PredictedPrice(**validated_data)
-    db.session.add(prediction_row)
+    db.session.add(PredictedPrice(**validated_data))
     db.session.commit()
 
     predicts_schema = PredictSchema(many=True)
