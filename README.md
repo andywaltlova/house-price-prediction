@@ -33,6 +33,7 @@ Frontend:
 - [ ] Refine the details - favicon, title etc.
 - [ ] Cypress tests
 - [ ] Check how it looks on smaller devices
+- [ ] Add clear tabe option
 
 General:
 
