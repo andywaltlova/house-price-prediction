@@ -4,7 +4,7 @@ import HouseIcon from '@mui/icons-material/House';
 
 const Header = () => {
     return (
-        <AppBar>
+        <AppBar position='static' style={{"marginBottom": 50}}>
             <Toolbar>
                 {/* <IconButton
                     edge="start"

@@ -46,6 +46,23 @@ def serve(path):
         return send_from_directory(app.static_folder, 'index.html')
 
 
+@app.route('/api/predictions', methods=['DELETE','GET', 'OPTIONS'])
+def predictions():
+
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
+
+    if request.method == "DELETE":
+        db.session.query(PredictedPrice).delete()
+        db.session.commit()
+        return _corsify_actual_response(jsonify([]))
+
+    predicts_schema = PredictSchema(many=True)
+    all_predicts = PredictedPrice.query.order_by(PredictedPrice.created_at.desc()).all()
+    result = predicts_schema.dump(all_predicts)
+    return _corsify_actual_response(jsonify({"data": result}))
+
+
 @app.route('/api/predict', methods=['POST', 'OPTIONS'])
 def predict_price():
     """
@@ -68,19 +85,39 @@ def predict_price():
         'NEAR OCEAN',
     }
 
+    predicts_schema = PredictSchema(many=True)
     try:
         # Attempt to deserialize and validate data
 
         ocean_proximity = data.pop('ocean_proximity', None)
         if ocean_proximity not in ocean_proximity_valid_values:
-            response = jsonify({"error": f"Invalid ocean_proximity value: {ocean_proximity}"})
+
+            all_predicts = PredictedPrice.query.order_by(PredictedPrice.created_at.desc()).all()
+            result = predicts_schema.dump(all_predicts)
+            response = jsonify(
+                {
+                    "errors": [f"Invalid ocean_proximity value: {ocean_proximity}"],
+                    "data": result
+                 }
+            )
             return _corsify_actual_response(response), 400
 
         schema = PredictSchema()
         data['ocean_proximity'] = ocean_proximity
         validated_data = schema.load(data)
     except ValidationError as err:
-        response = jsonify(err.messages)
+
+        all_predicts = PredictedPrice.query.order_by(PredictedPrice.created_at.desc()).all()
+        result = predicts_schema.dump(all_predicts)
+        response = jsonify(
+            {
+                "errors": [
+                    f"{k.title().replace('_', ' ')}: {' '.join(v)}"
+                    for k, v in err.messages.items()
+                ],
+                "data": result
+                }
+        )
         return _corsify_actual_response(response), 400
 
     ocean_proximity_columns = {f'ocean_proximity_{op}': 0 for op in ocean_proximity_valid_values}
@@ -115,7 +152,7 @@ def predict_price():
     predicts_schema = PredictSchema(many=True)
     all_predicts = PredictedPrice.query.order_by(PredictedPrice.created_at.desc()).all()
     result = predicts_schema.dump(all_predicts)
-    return _corsify_actual_response(jsonify(result))
+    return _corsify_actual_response(jsonify({"data": result}))
 
 def _build_cors_preflight_response():
     response = make_response()

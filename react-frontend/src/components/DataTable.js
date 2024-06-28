@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel
-} from '@mui/material';
+import React from 'react';
 import MapIcon from '@mui/icons-material/Map';
+import LinearProgress from '@mui/material/LinearProgress';
 
 import { DataGrid } from '@mui/x-data-grid';
+import CustomNoRowsOverlay from './CustomNoRowsOverlay';
 
-export default function DataTable({ rows }) {
+export default function DataTable({ rows, loading }) {
     const columns = [
         { field: 'created_at', headerName: 'Created At', width: 200 },
         { field: 'price', headerName: 'Price', flex: 1 },
@@ -26,6 +25,7 @@ export default function DataTable({ rows }) {
         },
     ]
     return (
+    <div style={{ height: 400, width: '100%' }}>
       <DataGrid
         style={{ "marginTop": "20px" }}
         getRowId={(row) => row.created_at}
@@ -36,9 +36,15 @@ export default function DataTable({ rows }) {
             paginationModel: { page: 0, pageSize: 5 },
           },
         }}
+        slots={{
+            noRowsOverlay: CustomNoRowsOverlay,
+            loadingOverlay: LinearProgress,
+        }}
+        sx={{ '--DataGrid-overlayHeight': '300px' }}
         pageSizeOptions={[5]}
-
+        loading={loading}
       />
+      </div>
   );
 }
 

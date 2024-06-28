@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, TextField, Button, Container, Grid, Select, MenuItem, InputLabel, FormControl, CircularProgress } from '@mui/material';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import axios from 'axios';
 import DataTable from './DataTable';
 
@@ -22,7 +23,7 @@ const SimpleForm = () => {
     ocean_proximity: 'NEAR OCEAN'
   });
 
-  const [data, setData] = useState(null);
+  const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
 
@@ -30,6 +31,31 @@ const SimpleForm = () => {
     const allFieldsFilled = Object.values(formData).every((field) => field !== '');
     setIsFormValid(allFieldsFilled);
   }, [formData]);
+
+  useEffect(() => {
+    if (!data.data) {
+      try {
+        axios.get('/api/predictions').then((response) => {
+          console.log(response.data.data)
+          setData(response.data);
+        });
+      } catch (error) {
+        // Give as detailed error message as possible
+        if (error?.response?.data) {
+          setData(error.response.data);
+        }
+      }
+    }
+  }, []);
+
+  const handleClear = () => {
+    setLoading(true);
+    axios.delete('/api/predictions').then((response) => {
+      setData(response.data);
+      setLoading(false);
+    });
+  };
+
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -44,13 +70,7 @@ const SimpleForm = () => {
       const response = await axios.post('/api/predict', formData);
       setData(response.data);
     } catch (error) {
-      console.error('Error:', error);
-      // Give as detailed error message as possible
-        if (error.response && error.response.data) {
-            setData({ error: `An error occurred: ${JSON.stringify(error.response.data)}`});
-        } else {
-            setData({ error: `An error occurred: ${error.message}` });
-        }
+        setData(error.response.data);
     } finally {
       setLoading(false);
     }
@@ -184,6 +204,13 @@ const SimpleForm = () => {
                 type="submit" variant="contained" color="primary" disabled={!isFormValid || loading}>
                 Predict
               </Button>
+              <Button
+                endIcon={<DeleteForeverIcon />}
+                variant="contained" color="error" style={{ marginLeft: '10px' }}
+                onClick={handleClear}
+              >
+                Clear
+              </Button>
             </Grid>
           </Grid>
         </form>
@@ -192,20 +219,16 @@ const SimpleForm = () => {
             Please fill in all fields
           </Alert>
         )}
-        {data && data.error && (
-          <Alert severity="error" style={{ marginTop: '20px' }}>
-            {data.error}
-          </Alert>
+        {data?.errors && (
+          data.errors.map((error) => (
+            <Alert key={error} severity="error" style={{ marginTop: '10px' }}>
+              {error}
+            </Alert>
+          ))
         )}
       </Container>
       <Container maxWidth='100%'>
-        {loading ?
-          <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
-            <CircularProgress />
-          </Grid>
-        : data !== null && !data.error && (
-            <DataTable rows={data}/>
-        )}
+        <DataTable rows={data?.data === undefined ? [] : data.data } loading={loading} />
       </Container>
     </Container>
   );
