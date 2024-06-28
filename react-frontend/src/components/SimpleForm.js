@@ -34,19 +34,19 @@ const SimpleForm = () => {
 
   useEffect(() => {
     if (!data.data) {
-      try {
-        axios.get('/api/predictions').then((response) => {
+      axios.get('/api/predictions').then((response) => {
           console.log(response.data.data)
           setData(response.data);
-        });
-      } catch (error) {
+      }).catch((error) => {
         // Give as detailed error message as possible
-        if (error?.response?.data) {
+        if (error?.response?.data?.errors) {
+          console.log(error.response.data)
           setData(error.response.data);
+        } else {
+          setData({ errors: ['An unknown error occurred. Please try again later.'] });
         }
-      }
-    }
-  }, []);
+      })
+    }}, []);
 
   const handleClear = () => {
     setLoading(true);
@@ -62,18 +62,19 @@ const SimpleForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     setLoading(true);
     setData(null);
-    try {
-      const response = await axios.post('/api/predict', formData);
-      setData(response.data);
-    } catch (error) {
+
+    axios.post('/api/predict', formData).then(
+        (response) => {
+        setData(response.data);
+    }).catch((error) => {
         setData(error.response.data);
-    } finally {
+    }).finally(() => {
       setLoading(false);
-    }
+    });
   };
 
   return (
