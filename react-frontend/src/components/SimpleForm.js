@@ -28,8 +28,18 @@ const SimpleForm = () => {
   const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
-    const allFieldsFilled = Object.values(formData).every((field) => field !== '');
-    setIsFormValid(allFieldsFilled);
+    const nonNegativeFields = [
+      'housing_median_age',
+      'total_rooms',
+      'total_bedrooms',
+      'population',
+      'households',
+      'median_income'
+    ];
+    const allFieldsFilled = Object.values(
+      formData).every((field) => field !== '');
+    const allNonNegative = nonNegativeFields.every((field) => (formData[field] !== '' && formData[field] >= 0));
+    setIsFormValid(allFieldsFilled && allNonNegative);
   }, [formData]);
 
   useEffect(() => {
@@ -214,7 +224,8 @@ const SimpleForm = () => {
             <Grid item xs={12} textAlign="center">
               <Button
                 endIcon={<AutoFixHighIcon />}
-                type="submit" variant="contained" color="primary" disabled={!isFormValid || loading}>
+                type="submit" variant="contained" color="primary"
+                disabled={!isFormValid || loading}>
                 Predict
               </Button>
               <Button
