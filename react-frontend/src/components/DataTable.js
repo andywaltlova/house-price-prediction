@@ -8,12 +8,12 @@ import CustomNoRowsOverlay from './CustomNoRowsOverlay';
 export default function DataTable({ rows, loading }) {
     const columns = [
         { field: 'created_at', headerName: 'Created At', width: 180 },
-        { field: 'price', headerName: 'Price', width: 180},
+        { field: 'price', headerName: 'Price ($)', width: 180},
         { field: 'latitude', headerName: 'Latitude', flex: 1 },
         { field: 'longitude', headerName: 'Longitude', flex: 1 },
         { field: 'households', headerName: 'Households', flex: 1 },
         { field: 'housing_median_age', headerName: 'Housing Median Age', flex: 1 },
-        { field: 'median_income', headerName: 'Median Income', flex: 1 },
+        { field: 'median_income', headerName: 'Median Income ($)', flex: 1 },
         { field: 'population', headerName: 'Population', flex: 1 },
         { field: 'total_bedrooms', headerName: 'Total Bedrooms', flex: 1 },
         { field: 'total_rooms', headerName: 'Total Rooms', flex: 1 },
