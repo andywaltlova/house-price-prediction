@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, TextField, Button, Container, Grid, Select, MenuItem, InputLabel, FormControl, CircularProgress } from '@mui/material';
+import { Alert, TextField, Button, Container, Grid, Select, MenuItem, InputLabel, FormControl, CircularProgress, FormHelperText, Divider } from '@mui/material';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import axios from 'axios';
@@ -123,7 +123,8 @@ const SimpleForm = () => {
               />
             </Grid>
             <Grid item xs={4}>
-              <FormControl fullWidth variant="outlined">
+              <FormControl fullWidth variant="outlined"
+              >
                 <InputLabel id="ocean-proximity-label">Ocean Proximity</InputLabel>
                 <Select
                   labelId="ocean-proximity-label"
@@ -133,13 +134,14 @@ const SimpleForm = () => {
                   onChange={handleInputChange}
                   error={formData.ocean_proximity === ''}
                   required
-                >
+                  >
                   {oceanProximityValidValues.map((option) => (
                     <MenuItem key={option} value={option}>
                       {option}
                     </MenuItem>
                   ))}
                 </Select>
+                  <FormHelperText>Location of the house w.r.t ocean/sea</FormHelperText>
               </FormControl>
             </Grid>
             <Grid item xs={4}>
@@ -151,7 +153,7 @@ const SimpleForm = () => {
                 value={formData.housing_median_age}
                 onChange={handleInputChange}
                 error={formData.housing_median_age === '' || formData.housing_median_age < 0}
-                helperText="Non-negative number in years"
+                helperText="Median age of a house within a block; a lower number is a newer building"
                 required
               />
             </Grid>
@@ -164,7 +166,7 @@ const SimpleForm = () => {
                 value={formData.total_rooms}
                 onChange={handleInputChange}
                 error={formData.total_rooms === '' || formData.total_rooms < 0}
-                helperText="Non-negative number"
+                helperText="Total number of rooms within a block"
                 required
               />
             </Grid>
@@ -177,7 +179,7 @@ const SimpleForm = () => {
                 value={formData.total_bedrooms}
                 onChange={handleInputChange}
                 error={formData.total_bedrooms === '' || formData.total_bedrooms < 0}
-                helperText="Non-negative number"
+                helperText="Total number of bedrooms within a block"
                 required
               />
             </Grid>
@@ -190,7 +192,7 @@ const SimpleForm = () => {
                 value={formData.population}
                 onChange={handleInputChange}
                 error={formData.population === '' || formData.population < 0}
-                helperText="Non-negative number"
+                helperText="Total number of people residing within a block"
                 required
               />
             </Grid>
@@ -203,7 +205,7 @@ const SimpleForm = () => {
                 value={formData.households}
                 onChange={handleInputChange}
                 error={formData.households === '' || formData.households < 0}
-                helperText="Non-negative number"
+                helperText="Total number of households, a group of people residing within a home unit, for a block"
                 required
               />
             </Grid>
@@ -216,12 +218,11 @@ const SimpleForm = () => {
                 value={formData.median_income}
                 onChange={handleInputChange}
                 error={formData.median_income === '' || formData.median_income < 0}
-                helperText="Non-negative number"
+                helperText="Median income for households within a block of houses (in tens of thousands of US Dollars)"
                 required
               />
             </Grid>
-
-            <Grid item xs={12} textAlign="center">
+            <Grid item xs={12} textAlign="center" marginY={1}>
               <Button
                 endIcon={<AutoFixHighIcon />}
                 type="submit" variant="contained" color="primary"
