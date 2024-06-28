@@ -71,7 +71,13 @@ const SimpleForm = () => {
         (response) => {
         setData(response.data);
     }).catch((error) => {
+      // Give as detailed error message as possible
+      if (error?.response?.data?.errors) {
+        console.log(error.response.data)
         setData(error.response.data);
+      } else {
+        setData({ errors: ['An unknown error occurred. Please try again later.'] });
+      }
     }).finally(() => {
       setLoading(false);
     });
@@ -79,7 +85,7 @@ const SimpleForm = () => {
 
   return (
     <Container maxWidth="false">
-      <Container maxWidth='sm'>
+      <Container maxWidth='md'>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={1}>
             <Grid item xs={4}>
@@ -135,6 +141,7 @@ const SimpleForm = () => {
                 value={formData.housing_median_age}
                 onChange={handleInputChange}
                 error={formData.housing_median_age === '' || formData.housing_median_age < 0}
+                helperText="Non-negative number in years"
                 required
               />
             </Grid>
@@ -147,6 +154,7 @@ const SimpleForm = () => {
                 value={formData.total_rooms}
                 onChange={handleInputChange}
                 error={formData.total_rooms === '' || formData.total_rooms < 0}
+                helperText="Non-negative number"
                 required
               />
             </Grid>
@@ -159,6 +167,7 @@ const SimpleForm = () => {
                 value={formData.total_bedrooms}
                 onChange={handleInputChange}
                 error={formData.total_bedrooms === '' || formData.total_bedrooms < 0}
+                helperText="Non-negative number"
                 required
               />
             </Grid>
@@ -171,6 +180,7 @@ const SimpleForm = () => {
                 value={formData.population}
                 onChange={handleInputChange}
                 error={formData.population === '' || formData.population < 0}
+                helperText="Non-negative number"
                 required
               />
             </Grid>
@@ -183,6 +193,7 @@ const SimpleForm = () => {
                 value={formData.households}
                 onChange={handleInputChange}
                 error={formData.households === '' || formData.households < 0}
+                helperText="Non-negative number"
                 required
               />
             </Grid>
@@ -195,6 +206,7 @@ const SimpleForm = () => {
                 value={formData.median_income}
                 onChange={handleInputChange}
                 error={formData.median_income === '' || formData.median_income < 0}
+                helperText="Non-negative number"
                 required
               />
             </Grid>
